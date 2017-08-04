@@ -1,0 +1,6 @@
+{
+  "rules": {
+    no-multiple-empty-lines: ["warn", {"max": 2}]
+  },
+  "extends": "standard"
+}
