@@ -11,7 +11,10 @@
     "babel-register": "^6.24.1",
     "express": "^4.15.3",
     "express-graphql": "^0.6.7",
-    "graphql": "^0.10.5"
+    "graphql": "^0.10.5",
+    "sql": "^0.77.0",
+    "sqlite": "^2.8.0",
+    "sqlite3": "^3.1.8"
   },
   "devDependencies": {
     "eslint": "^4.3.0",

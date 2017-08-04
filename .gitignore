@@ -1,2 +1,5 @@
 # Dirs
 node_modules
+
+# Files
+db.sqlite
