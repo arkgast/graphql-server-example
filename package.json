@@ -1,0 +1,14 @@
+{
+  "name": "graphql-server-example",
+  "version": "0.1.0",
+  "description": "GraphQL Example",
+  "main": "index.js",
+  "repository": "git@github.com:arkgast/graphql-server-example.git",
+  "author": "Arnold Gandarillas Castillo <arkgast@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "babel-preset-es2015": "^6.24.1",
+    "babel-register": "^6.24.1",
+    "express": "^4.15.3"
+  }
+}
