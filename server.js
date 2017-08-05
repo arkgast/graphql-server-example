@@ -5,6 +5,9 @@ import {
   GraphQLNonNull, GraphQLID
 } from 'graphql'
 
+import { NodeInterface, UserType, PostType } from './src/types'
+import * as loaders from './src/loaders'
+
 
 const app = express()
 
@@ -14,14 +17,14 @@ const RootQuery = new GraphQLObjectType({
   description: 'The root query',
   fields: {
     node: {
-      type: GraphQLString,
+      type: NodeInterface,
       args: {
         id: {
           type: new GraphQLNonNull(GraphQLID)
         }
       },
       resolve (source, args) {
-        return inMemoryStore[args.id]
+        return loaders.getNodeById(args.id)
       }
     }
   }
@@ -52,6 +55,7 @@ const RootMutation = new GraphQLObjectType({
 })
 
 const Schema = new GraphQLSchema({
+  types: [UserType, PostType],
   query: RootQuery,
   mutation: RootMutation
 })
