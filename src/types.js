@@ -2,11 +2,13 @@ import {
   GraphQLInterfaceType,
   GraphQLObjectType,
   GraphQLID,
+  GraphQLList,
   GraphQLString,
   GraphQLNonNull
 } from 'graphql'
 
 import * as tables from './tables'
+import * as loaders from './loaders'
 
 
 export const NodeInterface = new GraphQLInterfaceType({
@@ -41,6 +43,17 @@ export const UserType = new GraphQLObjectType({
     },
     about: {
       type: new GraphQLNonNull(GraphQLString)
+    },
+    friends: {
+      type: new GraphQLList(GraphQLID),
+      resolve (source) {
+        return loaders.getFriendIdsForUser(source).then(rows => {
+          return rows.map(row => {
+            console.log(row)
+            return tables.dbIdToNodeId(row.user_id_b, row.__tableName)
+          })
+        })
+      }
     }
   }
 })
