@@ -4,6 +4,8 @@ import {
   GraphQLID,
   GraphQLList,
   GraphQLString,
+  GraphQLInt,
+  GraphQLBoolean,
   GraphQLNonNull
 } from 'graphql'
 
@@ -30,6 +32,51 @@ const resolveId = (source) => {
   return tables.dbIdToNodeId(source.id, source.__tableName)
 }
 
+const PageInfoType = new GraphQLObjectType({
+  name: 'PageInfo',
+  fields: {
+    hasNextPage: {
+      type: new GraphQLNonNull(GraphQLBoolean)
+    },
+    hasPreviousPage: {
+      type: new GraphQLNonNull(GraphQLBoolean)
+    },
+    startCursor: {
+      type: GraphQLString
+    },
+    endCursor: {
+      type: GraphQLString
+    }
+  }
+})
+
+const PostEdgeType = new GraphQLObjectType({
+  name: 'PostEdge',
+  fields: () => {
+    return {
+      cursor: {
+        type: new GraphQLNonNull(GraphQLString)
+      },
+      node: {
+        type: new GraphQLNonNull(PostType)
+      }
+    }
+  }
+})
+
+const PostsConnectionType = new GraphQLObjectType({
+  name: 'PostsConnection',
+  fields: {
+    pageInfo: {
+      type: new GraphQLNonNull(PageInfoType)
+    },
+    edges: {
+      type: new GraphQLList(PostEdgeType)
+    }
+  }
+})
+
+
 export const UserType = new GraphQLObjectType({
   name: 'User',
   interfaces: [ NodeInterface ],
@@ -50,6 +97,38 @@ export const UserType = new GraphQLObjectType({
               return loaders.getNodeById(friendNodeId)
             })
             return Promise.all(promises)
+          })
+        }
+      },
+      posts: {
+        type: PostsConnectionType,
+        args: {
+          after: {
+            type: GraphQLString
+          },
+          first: {
+            type: GraphQLInt
+          }
+        },
+        resolve (source, args) {
+          return loaders.getPostIdsForUser(source, args).then(({ rows, pageInfo }) => {
+            const promises = rows.map((row) => {
+              const postNodeId = tables.dbIdToNodeId(row.id, row.__tableName)
+              return loaders.getNodeById(postNodeId).then((node) => {
+                const edge = {
+                  node,
+                  cursor: row.__cursor
+                }
+                return edge
+              })
+            })
+
+            return Promise.all(promises).then((edges) => {
+              return {
+                edges,
+                pageInfo
+              }
+            })
           })
         }
       }
