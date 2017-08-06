@@ -1,4 +1,5 @@
 import express from 'express'
+import basicAuth from 'basic-auth-connect'
 import graphqlHTTP from 'express-graphql'
 import {
   GraphQLSchema, GraphQLObjectType, GraphQLString,
@@ -10,6 +11,10 @@ import * as loaders from './src/loaders'
 
 
 const app = express()
+
+app.use(basicAuth((user, pass) => {
+  return user === 'harry' && pass === 'password1'
+}))
 
 // Query
 const RootQuery = new GraphQLObjectType({
