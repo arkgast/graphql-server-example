@@ -34,3 +34,45 @@ export const getFriendIdsForUser = (userSource) => {
     return rows
   })
 }
+
+export const getUserNodeWithFriends = (nodeId) => {
+  const { tableName, dbId } = tables.splitNodeId(nodeId)
+
+  const query = tables.users
+    .select(tables.usersFriends.user_id_b, tables.users.star())
+    .from(
+      tables.users
+        .leftJoin(tables.usersFriends)
+        .on(tables.usersFriends
+          .user_id_a
+          .equals(tables.users.id))
+    )
+    .where(tables.users.id.equals(dbId))
+    .toQuery()
+
+  console.log(query)
+
+  return database.getSql(query).then((rows) => {
+    if (!rows[0]) {
+      return undefined
+    }
+
+    const __friends = rows.map((row) => {
+      return {
+        user_id_b: row.user_id_b,
+        __tableName: tables.users.getName()
+      }
+    })
+
+    const friend = rows[0]
+    const source = {
+      id: friend.id,
+      name: friend.name,
+      about: friend.about,
+      __tableName: tableName,
+      __friends: __friends
+    }
+
+    return source
+  })
+}
