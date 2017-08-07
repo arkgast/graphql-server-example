@@ -52,3 +52,34 @@ Get the user with his posts with some extra metadata
         }
       }
     }
+
+Get posts of friends, with authorization just friends can view posts of a user
+
+    {
+      node(id:"users:2") {
+        ... on User {
+          posts {
+            edges {
+              node {
+                id
+                ... on Post {
+                  body
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+## Mutation
+
+Insert a post
+
+    mutation {
+      createPost(body:"New post!", level:PUBLIC) {
+        id
+        body
+        created_at
+      }
+    }

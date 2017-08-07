@@ -3,7 +3,7 @@ import basicAuth from 'basic-auth-connect'
 import graphqlHTTP from 'express-graphql'
 import {
   GraphQLSchema, GraphQLObjectType, GraphQLString,
-  GraphQLNonNull, GraphQLID
+  GraphQLNonNull, GraphQLID, GraphQLEnumType
 } from 'graphql'
 
 import { NodeInterface, UserType, PostType } from './src/types'
@@ -15,6 +15,24 @@ const app = express()
 app.use(basicAuth((user, pass) => {
   return user === '1' && pass === 'password'
 }))
+
+const LevelEnum = new GraphQLEnumType({
+  name: 'PrivacyLevel',
+  values: {
+    PUBLIC: {
+      value: 'public'
+    },
+    ACQUAINTANCE: {
+      value: 'acquaintance'
+    },
+    FRIEND: {
+      value: 'friend'
+    },
+    TOP: {
+      value: 'top'
+    }
+  }
+})
 
 // Query
 const RootQuery = new GraphQLObjectType({
@@ -62,24 +80,24 @@ const RootQuery = new GraphQLObjectType({
 })
 
 // Mutation
-let inMemoryStore = {}
 const RootMutation = new GraphQLObjectType({
   name: 'RootMutation',
   description: 'The root mutation',
   fields: {
-    setNode: {
-      type: GraphQLString,
+    createPost: {
+      type: PostType,
       args: {
-        id: {
-          type: new GraphQLNonNull(GraphQLID)
-        },
-        value: {
+        body: {
           type: new GraphQLNonNull(GraphQLString)
+        },
+        level: {
+          type: new GraphQLNonNull(LevelEnum)
         }
       },
-      resolve (source, args) {
-        inMemoryStore[args.id] = args.value
-        return inMemoryStore[args.id]
+      resolve (source, args, context) {
+        return loaders.createPost(args.body, args.level, context).then((nodeId) => {
+          return loaders.getNodeById(nodeId)
+        })
       }
     }
   }
