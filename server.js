@@ -13,7 +13,7 @@ import * as loaders from './src/loaders'
 const app = express()
 
 app.use(basicAuth((user, pass) => {
-  return user === 'harry' && pass === 'password1'
+  return user === '1' && pass === 'password'
 }))
 
 // Query
@@ -21,6 +21,12 @@ const RootQuery = new GraphQLObjectType({
   name: 'RootQuery',
   description: 'The root query',
   fields: {
+    viewer: {
+      type: NodeInterface,
+      resolve (source, args, context) {
+        return loaders.getNodeById(context)
+      }
+    },
     node: {
       type: NodeInterface,
       args: {
@@ -85,7 +91,11 @@ const Schema = new GraphQLSchema({
   mutation: RootMutation
 })
 
-app.use('/graphql', graphqlHTTP({ schema: Schema, graphiql: true }))
+// app.use('/graphql', graphqlHTTP({ schema: Schema, graphiql: true }))
+app.use('/graphql', graphqlHTTP((req) => {
+  const context = 'users:' + req.user
+  return { schema: Schema, graphiql: true, context: context, pretty: true }
+}))
 
 app.listen(3000, () => {
   console.log('Im running!')
