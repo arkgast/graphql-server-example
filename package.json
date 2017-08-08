@@ -6,6 +6,10 @@
   "repository": "git@github.com:arkgast/graphql-server-example.git",
   "author": "Arnold Gandarillas Castillo <arkgast@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "createdb": "node -e 'require(\"babel-register\"); require(\"./src/seedData\")'",
+    "start": "node index.js"
+  },
   "dependencies": {
     "babel-preset-es2015": "^6.24.1",
     "babel-register": "^6.24.1",

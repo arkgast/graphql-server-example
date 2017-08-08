@@ -1,15 +1,16 @@
-# Small Facebook Clone
+# Small Social Network
 
 This project is intended to test and learn graphql
 
-## Steps to test it
+## Requirements
 
     $ git clone https://github.com/arkgast/graphql-server-example
     $ cd graphql-server-example
     $ yarn
-    $ node index.js
+    $ npm run createdb
+    $ npm start
 
-and finally go to [http://localhost:3000/graphql](http://localhost:3000/graphql)
+and finally go to [http://localhost:3000/graphql](http://localhost:3000/graphql) and that's it.
 
 ## Queries
 
@@ -34,7 +35,7 @@ Get the user with his posts with some extra metadata
     query {
       node(id:"users:1") {
         ... on User {
-          posts(first: 1) {
+          posts(first: 1, after:"1:2016-04-01") {
             pageInfo {
               hasNextPage
               hasPreviousPage
@@ -45,7 +46,7 @@ Get the user with his posts with some extra metadata
               cursor
               node {
                 id
-                  body
+                body
               }
             }
           }
@@ -83,3 +84,9 @@ Insert a post
         created_at
       }
     }
+
+Levels are:
+  * PUBLIC
+  * ACQUAINTANCE
+  * FRIEND
+  * TOP
